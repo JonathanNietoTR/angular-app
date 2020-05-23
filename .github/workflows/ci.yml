@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest # this job will running on ubuntu-latest
     steps:
       # we nned to checkout into our repository to pull our code
-      - uses: action/checkout@v2
+      - uses: actions/checkout@v2
       # we can use and scpecify node version
       - name: Use NodeJS
         uses: actions/setup-node@v1
