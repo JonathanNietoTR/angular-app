@@ -1,0 +1,22 @@
+name: Continuous Integration
+on:
+  pull_request: # this workflow will work for pull_request on develop branch
+    branches: [develop]
+
+jobs:
+  building-angular-app: # job's name
+    runs-on: ubuntu-latest # this job will running on ubuntu-latest
+    steps:
+      # we nned to checkout into our repository to pull our code
+      - uses: action/checkout@v2
+      # we can use and scpecify node version
+      - name: Use NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - run: npm ci # similar to npm install but npm ci is for CI
+      - run: npm run format:check
+      - run: npm test --code-coverage
+        env:
+          CI: true
+        
