@@ -1,0 +1,36 @@
+name: Continuous Integration
+on:
+  pull_request: # this workflow will work for pull_request on develop branch
+    branches: [develop]
+  push: # this workflow will work for push on develop branch
+    branches: [develop]
+
+jobs:
+  building-angular-app: # job's name
+    runs-on: ubuntu-latest # this job will running on ubuntu-latest
+    steps:
+      # we nned to checkout into our repository to pull our code
+      - uses: actions/checkout@v2
+      # we can use and scpecify node version
+      - name: Use NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - run: npm ci # similar to npm install but npm ci is for CI
+      - run: npm run format:check
+      - run: npm test --code-coverage
+        env:
+          CI: true
+      # Building Project
+      - name: Building Project
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npm run build
+        # Deploy to Staging
+      - name: Deploying to Staging
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npx surge --project ./dist/angular-app --domain https://polite-low.surge.sh
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
