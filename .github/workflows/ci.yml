@@ -2,6 +2,8 @@ name: Continuous Integration
 on:
   pull_request: # this workflow will work for pull_request on develop branch
     branches: [develop]
+  push: # this workflow will work for push on develop branch
+    branches: [develop]
 
 jobs:
   building-angular-app: # job's name
@@ -19,4 +21,16 @@ jobs:
       - run: npm test --code-coverage
         env:
           CI: true
-        
+      # Building Project
+      - name: Building Project
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npm run build
+        # Deploy to Staging
+      - name: Deploying to Staging
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npx surge --project ./dist/angular-app --domain https://polite-low.surge.sh
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
