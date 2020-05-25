@@ -1,0 +1,63 @@
+name: Continuous Integration
+on:
+  pull_request: # this workflow will work for pull_request on develop branch, master
+    branches: [develop, master]
+  push: # this workflow will work for push on develop branch, master
+    branches: [develop, master]
+
+jobs:
+  building-angular-app: # job's name
+    runs-on: ubuntu-latest # this job will running on ubuntu-latest
+    steps:
+      # we nned to checkout into our repository to pull our code
+      - uses: actions/checkout@v2
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node- 
+      # we can use and scpecify node version
+      - name: Use NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - run: npm ci # similar to npm install but npm ci is for CI
+      - run: npm run format:check
+      - run: npm test --code-coverage
+        env:
+          CI: true
+      - name: Creating a Release
+        # accessing the "github" context and event "event_name" and making sure it's push, But we also need to check that we are pushing into the master branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
+      - name: Uploading Test Coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage
+          path: ./coverage
+      # Building Project
+      - name: Building Project
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npm run build
+      # This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
+      - name: Uploading Build Folder
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./dist/angular-app
+        # Deploy to Staging
+      - name: Deploying to Staging
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        run: npx surge --project ./dist/angular-app --domain https://polite-low.surge.sh
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
