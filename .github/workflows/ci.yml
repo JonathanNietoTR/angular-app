@@ -28,11 +28,25 @@ jobs:
       - run: npm test --code-coverage
         env:
           CI: true
+      # This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
+      - name: Uploading Test Coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage
+          path: ./coverage
       # Building Project
       - name: Building Project
         # accessing the "github" context and event "event_name" and making sure it's push
         if: github.event_name == 'push'
         run: npm run build
+      # This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
+      - name: Uploading Build Folder
+        # accessing the "github" context and event "event_name" and making sure it's push
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: ./dist/angular-app
         # Deploy to Staging
       - name: Deploying to Staging
         # accessing the "github" context and event "event_name" and making sure it's push
