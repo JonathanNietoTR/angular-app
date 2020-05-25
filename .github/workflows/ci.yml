@@ -28,12 +28,6 @@ jobs:
       - run: npm test --code-coverage
         env:
           CI: true
-      - name: Creating a Release
-        # accessing the "github" context and event "event_name" and making sure it's push, But we also need to check that we are pushing into the master branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
       - name: Uploading Test Coverage
         uses: actions/upload-artifact@v2
@@ -53,6 +47,18 @@ jobs:
         with:
           name: build
           path: ./dist/angular-app
+      - name: Zipping Assets
+        # accessing the "github" context and event "event_name" and making sure it's push, But we also need to check that we are pushing into the master branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          zip -r build.zip ./dist/angular-app
+          zip -r coverage.zip ./coverage
+      - name: Creating a Release
+        # accessing the "github" context and event "event_name" and making sure it's push, But we also need to check that we are pushing into the master branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Deploy to Staging
       - name: Deploying to Staging
         # accessing the "github" context and event "event_name" and making sure it's push
