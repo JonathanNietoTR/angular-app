@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     "branches": "master",
     "repositoryUrl": "https://github.com/JonathanNietoTR/angular-app.git",
     "plugins": [
