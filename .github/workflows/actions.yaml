@@ -15,9 +15,9 @@ jobs:
             assignees: | 
               John Doe
               Jane Doe
-        run: |
+      - run: |
           echo ${{ steps.issue.outputs.issue }}
-          
+
       # step hello
       - uses: ./.github/actions/hello
         id: hello
