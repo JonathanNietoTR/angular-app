@@ -1,0 +1,13 @@
+on: push
+jobs:
+  testing-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/hello
+        id: hello
+        with:
+          who-to-greet: "John Doe"
+        # Use the output from the `hello` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
