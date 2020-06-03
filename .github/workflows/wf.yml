@@ -1,0 +1,34 @@
+name: Continuous Integration
+on:
+  pull_request: # this workflow will work for pull_request on develop branch, master
+    branches: [develop, master]
+  push: # this workflow will work for push on develop branch, master
+    branches: [develop, master]
+jobs:   
+  deploy:     
+    runs-on: ubuntu-latest     
+    steps:
+      # - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
+        with:
+          repository: tr/maf-configurations_pipeline-libs
+          token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Copy common actions locally
+        run: |
+          ls -al
+          ls -R 
+        # working-directory: .github/         
+        # # run: git clone https://$USERNAME:$PASSWORD@github.com/tr/digital_common-github-actions.git$PASSWORD@github.com/tr/digital_common-github-actions.git         
+        # run: git clone https://$USERNAME:$PASSWORD@github.com/tr/maf-configurations_pipeline-libs.git
+        # env:           
+        #   USERNAME: ${{ secrets.USERNAME }}          
+        #   PASSWORD: ${{ secrets.PASSWORD }}       
+      # - name: Deploy to wpengine development environment from development branch         
+      #   uses: ./.github/digital_common-github-actions/wordpress/setup-and-deploy-template-docker-action         
+      #   if: github.ref == 'refs/heads/development'         
+      #   with:           
+      #     private-key: ${{ secrets.PRIVATE_KEY }}          
+      #     public-key: ${{ secrets.PUBLIC_KEY }}          
+      #     site-name: 'taxaudev'           
+      #     branch: 'development'
+          
